@@ -27,6 +27,7 @@ RUN pip3 install -r requirements-dev.txt
 ## Build
 RUN cmake -DCOMPUTE_BACKEND=hip -S . -DBNB_ROCM_ARCH=${ROCM_ARCH}
 RUN make
+RUN python3 setup.py bdist_wheel --universal
 
 # Cleanup
 RUN apt-get clean && pip3 cache purge

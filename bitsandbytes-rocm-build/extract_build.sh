@@ -3,7 +3,7 @@
 # Set variables
 IMAGE_NAME="bitsandbytes-rocm-build:6.1.2"
 CONTAINER_NAME="bitsandbytes-rocm-build"
-FILE_IN_CONTAINER="/tmp/bitsandbytes"
+FILE_IN_CONTAINER="/tmp/bitsandbytes/dist/"
 FILE_ON_HOST="./build_output/"
 
 # Run the Docker container
@@ -28,4 +28,4 @@ fi
 docker stop $CONTAINER_NAME
 docker rm $CONTAINER_NAME
 
-echo "Now you can install bitsandbytes locally using \"pip install .\" in the build_output/bitsandbytes folder"
+echo "Now you can install bitsandbytes locally using \"pip install\" with the file in the build_output/ folder"

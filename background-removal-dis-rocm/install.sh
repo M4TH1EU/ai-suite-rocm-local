@@ -4,7 +4,11 @@ python_exec="$(pwd)/venv/bin/python3.10"
 
 # Function to install StableDiffusion
 install_background_remover() {
+    # As no data is stored in the webui folder, we can re-run the installation process for updates
+    rm -R webui -f
+
     echo "Cloning webui..."
+      # original repo (hf): https://huggingface.co/spaces/ECCV2022/dis-background-removal/tree/main
     git clone ssh://git@git.broillet.ch:222/Clone/dis-background-removal.git webui
     
     echo "Installing requirements..."

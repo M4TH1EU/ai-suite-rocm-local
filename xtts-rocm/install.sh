@@ -2,10 +2,15 @@
 source ../utils.sh
 python_exec=venv/bin/python3.10
 
-# Function to install StableDiffusion
+# Function to install/update StableDiffusion
 install_xtts() {
     if [ -d "webui" ]; then
         echo "XTTS repository already exists. Skipping clone."
+        yes_or_no "Do you want to update XTTS WebUI ?" && {
+            cd webui
+            git pull
+            echo "XTTS WebUI successfully updated."
+        }
     else
         echo "Cloning XTTS repository..."
         git clone https://github.com/daswer123/xtts-webui webui
@@ -32,7 +37,7 @@ main() {
 
     clean
 
-    echo "XTTS installation complete."
+    echo "XTTS installation/update complete."
 }
 
 # Run main function

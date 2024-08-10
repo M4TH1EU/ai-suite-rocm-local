@@ -8,15 +8,17 @@ install_xtts() {
         echo "XTTS repository already exists. Skipping clone."
         yes_or_no "Do you want to update XTTS WebUI ?" && {
             cd webui
+            rm requirements_without_torch.txt
             git pull
             echo "XTTS WebUI successfully updated."
+            cd ..
         }
     else
         echo "Cloning XTTS repository..."
         git clone https://github.com/daswer123/xtts-webui webui
-        grep -v 'torch' requirements.txt > requirements_without_torch.txt
     fi
 
+    iconv -f UTF-16 -t UTF-8 webui/requirements.txt | grep -v 'torch' > webui/requirements_without_torch.txt
     $python_exec -m pip install -r webui/requirements_without_torch.txt
 
     # Disable gpu for faster-whipser as ROCM isn't supported yet
@@ -24,7 +26,7 @@ install_xtts() {
     sed -i 's/asr_model = WhisperModel(whisper_model, device=device, compute_type="float16")/asr_model = WhisperModel(whisper_model, device=device, compute_type="int8")/' webui/scripts/utils/formatter.py
 
     # Deepspeed and ninja (not working)
-    $python_exec -m pip install deepspeed ninja
+    $python_exec -m pip install ninja #deepspeed
     # apt-get install -y ninja-build
 }
 

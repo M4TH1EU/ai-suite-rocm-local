@@ -27,17 +27,20 @@ use_venv() {
 # Function to install build-essential or equivalent
 install_build_essentials() {
     echo "Checking for build essentials..."
+
     if [ -f /etc/debian_version ]; then
         sudo apt-get update
         sudo apt-get install -y build-essential python3.10-dev
+
     elif [ -f /etc/fedora-release ]; then
-        if dnf list installed @development-tools &>/dev/null; then
-            echo "Development Tools are already installed."
+        if rpm -q gcc &>/dev/null && rpm -q python3.10-devel &>/dev/null; then
+            echo "Development Tools and Python 3.10 development files are already installed."
         else
-            echo "Installing Development Tools..."
+            echo "Installing Development Tools and Python 3.10 development files..."
             sudo dnf groupinstall -y "Development Tools"
-            sudo dnf install python3.10-devel
+            sudo dnf install -y python3.10-devel
         fi
+
     else
         echo "Unsupported operating system. Please install build-essential or equivalent manually."
         exit 1
@@ -68,4 +71,14 @@ prepare_env(){
 
 clean() {
     python3.10 -m pip cache purge
+}
+
+yes_or_no() {
+    while true; do
+        read -p "$* [y/n]: " yn
+        case $yn in
+            [Yy]*) return 0  ;;  
+            [Nn]*) echo "Aborted" ; return  1 ;;
+        esac
+    done
 }

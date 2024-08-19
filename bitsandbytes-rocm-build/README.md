@@ -12,5 +12,5 @@ This creates a Docker image that builds the package and extract the built wheel 
 
 The wheel file will be in a folder named ``build_output/``
 
-You can also find my latest build in the releases section.
+*You might also find one of my already built wheel in this folder (may not be up to date)*
 

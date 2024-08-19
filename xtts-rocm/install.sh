@@ -26,8 +26,10 @@ install_xtts() {
     sed -i 's/asr_model = WhisperModel(whisper_model, device=device, compute_type="float16")/asr_model = WhisperModel(whisper_model, device=device, compute_type="int8")/' webui/scripts/utils/formatter.py
 
     # Deepspeed and ninja (not working)
-    $python_exec -m pip install ninja #deepspeed
+    $python_exec -m pip install ninja deepspeed
     # apt-get install -y ninja-build
+
+    ln -S webui/models models
 }
 
 # Main function

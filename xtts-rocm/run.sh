@@ -11,7 +11,8 @@ main() {
     rocm-smi
 
     # Start XTTS
-    $python_exec webui/app.py --host 0.0.0.0 -v v2.0.3
+    cd webui/
+    TORCH_BLAS_PREFER_HIPBLASLT=0 ../$python_exec app.py --host 0.0.0.0 -v v2.0.3
 }
 
 main

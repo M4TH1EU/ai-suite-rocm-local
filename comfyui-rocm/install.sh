@@ -29,7 +29,7 @@ install() {
 
         # Add GGUF support
         git clone https://github.com/city96/ComfyUI-GGUF
-        $python_exec -m pip install --upgrade gguf
+        $python_exec -m pip install --upgrade gguf numpy==1.26.4
 
         # Add NF4 support
         git clone https://github.com/comfyanonymous/ComfyUI_bitsandbytes_NF4.git

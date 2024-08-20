@@ -1,0 +1,4 @@
+venv/
+webui/
+models/
+*.log

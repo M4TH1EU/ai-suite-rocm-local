@@ -21,9 +21,19 @@ install() {
         echo "Running $NAME setup..."
         $python_exec -m pip install -r webui/requirements.txt
 
-        # Install manager
+
         cd webui/custom_nodes
+
+        # Install manager
         git clone https://github.com/ltdrdata/ComfyUI-Manager.git
+
+        # Add GGUF support
+        git clone https://github.com/city96/ComfyUI-GGUF
+        $python_exec -m pip install --upgrade gguf
+
+        # Add NF4 support
+        git clone https://github.com/comfyanonymous/ComfyUI_bitsandbytes_NF4.git
+        $python_exec -m pip install --upgrade ../../../bitsandbytes-rocm-build/bitsandbytes-0.43.3.dev0-cp310-cp310-linux_x86_64.whl # install bitsandbytes for rocm until it is available on pypi
 
         ln -s webui/models models
     fi

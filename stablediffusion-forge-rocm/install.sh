@@ -18,6 +18,9 @@ install_stablediffusionforge() {
         echo "Running StableDiffusionForge setup..."
         $python_exec webui/launch.py --skip-torch-cuda-test --exit
 
+        echo "Adding Flux NF4 support for ROCM"
+        $python_exec -m pip install --upgrade ../bitsandbytes-rocm-build/bitsandbytes-0.43.3.dev0-cp310-cp310-linux_x86_64.whl # install bitsandbytes for rocm until it is available on pypi
+
         ln -s webui/models models
         ln -s webui/outputs outputs
     fi

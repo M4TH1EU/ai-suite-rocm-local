@@ -11,8 +11,7 @@ main() {
     rocm-smi
 
     # Start SD
-    TORCH_BLAS_PREFER_HIPBLASLT=0 $python_exec webui/launch.py --listen --enable-insecure-extension-access # --opt-split-attention
-
+    TORCH_BLAS_PREFER_HIPBLASLT=0 $python_exec webui/server.py --listen
 }
 
 main

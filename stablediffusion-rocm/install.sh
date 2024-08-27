@@ -1,6 +1,6 @@
 #!/bin/bash
 source ../utils.sh
-python_exec=venv/bin/python3.10
+python_exec="$(pwd)/venv/bin/python3.10"
 
 # Function to install/update StableDiffusion
 install_stablediffusion() {

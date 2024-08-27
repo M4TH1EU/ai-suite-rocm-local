@@ -10,8 +10,9 @@ main() {
     # Prints ROCM info with available GPUs
     rocm-smi
 
-    # Start SD
-    TORCH_BLAS_PREFER_HIPBLASLT=0 $python_exec webui/server.py --listen
+    # Start
+    cd webui
+    TORCH_BLAS_PREFER_HIPBLASLT=0 $python_exec server.py --listen
 }
 
 main

@@ -22,8 +22,7 @@ install() {
         $python_exec -m pip install auto-gptq[triton] --no-build-isolation --extra-index-url https://huggingface.github.io/autogptq-index/whl/rocm573/
 
         # Add LlamaCPP
-        CMAKE_ARGS="-DLLAMA_CLBLAST=on" FORCE_CMAKE=1 $python_exec -m pip install llama-cpp-python
-        # CMAKE_ARGS="-DGGML_HIPBLAS=on" FORCE_CMAKE=1 $python_exec -m pip install llama-cpp-python
+        CMAKE_ARGS="-DGGML_HIPBLAS=on" FORCE_CMAKE=1 $python_exec -m pip install llama-cpp-python
 
         # Add Triton
 #        git clone https://github.com/ROCmSoftwarePlatform/triton.git .tritonrocm
@@ -45,10 +44,11 @@ install() {
 
         $python_exec -m pip install -r webui/requirements_amd.txt
 
-        $python_exec -m pip install accelerate # only works after requirements_amd.txt is installed ??!
-        $python_exec -m pip install lm_eval optimum autoawq
+        # only works after requirements_amd.txt is installed ??!
+        $python_exec -m pip install accelerate optimum
         $python_exec -m pip install https://github.com/casper-hansen/AutoAWQ_kernels/releases/download/v0.0.7/autoawq_kernels-0.0.7+rocm571-cp310-cp310-linux_x86_64.whl --no-deps
         $python_exec -m pip install https://github.com/casper-hansen/AutoAWQ/releases/download/v0.2.6/autoawq-0.2.6-cp310-cp310-linux_x86_64.whl --no-deps
+        $python_exec -m pip install lm_eval
         ln -s webui/models models
     fi
 

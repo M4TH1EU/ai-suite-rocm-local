@@ -21,7 +21,7 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3.10 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN pip3 install --upgrade pip wheel setuptools
+RUN pip3 install --upgrade pip wheel setuptools build
 
 # Install pytorch for rocm
 RUN pip3 install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/${TORCH_VERSION}

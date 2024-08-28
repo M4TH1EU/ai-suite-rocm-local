@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # For bitsandbytes
 ENV BNB_GPU_TARGETS="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102"
 # For LLAMA
-ENV GPU_TARGETS="gfx803 gfx900 gfx906 gfx908 gfx90a gfx1010 gfx1030 gfx1100 gfx1101 gfx1102"
+ENV GPU_TARGETS="gfx803 gfx900 gfx906 gfx908 gfx90a gfx1010 gfx1030 gfx1100 gfx1101"
 
 
 WORKDIR /tmp

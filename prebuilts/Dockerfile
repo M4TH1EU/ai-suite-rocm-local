@@ -1,4 +1,4 @@
-ARG ROCM_VERSION=0.0
+ARG ROCM_VERSION=6.1.2
 FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive \

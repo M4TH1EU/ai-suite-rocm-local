@@ -2,6 +2,10 @@
 
 This is a simple project to make hosting multiple AI tools easily on Linux with AMD GPUs using ROCM locally (without docker).
 
+> [!WARNING]
+> Currently rewriting this project to be more modular and easier to use. This is a work in progress.
+> Instructions below outdated !
+
 To use you have to clone the repo run the install script for the service you want to use.
 
 ```bash

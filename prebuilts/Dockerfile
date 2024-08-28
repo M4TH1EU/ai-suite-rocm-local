@@ -1,4 +1,5 @@
-FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
+ARG IMAGE_NAME=rocm/dev-ubuntu-22.04:${ROCM_VERSION}
+FROM ${IMAGE_NAME}
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \

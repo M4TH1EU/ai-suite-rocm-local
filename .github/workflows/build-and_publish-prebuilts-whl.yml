@@ -50,16 +50,14 @@ jobs:
       # Step 5: Copy bitsandbytes wheel artifact to host
       - name: Copy bitsandbytes wheel to host
         run: |
-          mkdir -p /tmp/bitsandbytes/dist
-          docker cp prebuilt-container:/tmp/bitsandbytes/dist/ /tmp/bitsandbytes/dist/
-          ls -l /tmp/bitsandbytes/dist/
+          mkdir -p /tmp/bitsandbytes/
+          docker cp prebuilt-container:/tmp/bitsandbytes/dist/ /tmp/bitsandbytes/
 
       # Step 6: Copy llama-cpp-python wheel artifact to host
       - name: Copy llama-cpp-python wheel to host
         run: |
-          mkdir -p /tmp/llama-cpp-python/dist
-          docker cp prebuilt-container:/tmp/llama-cpp-python/dist/ /tmp/llama-cpp-python/dist/
-          ls -l /tmp/llama-cpp-python/dist/
+          mkdir -p /tmp/llama-cpp-python/
+          docker cp prebuilt-container:/tmp/llama-cpp-python/dist/ /tmp/llama-cpp-python/
 
       # Step 7: Upload bitsandbytes wheel artifact
       - name: Upload bitsandbytes wheel

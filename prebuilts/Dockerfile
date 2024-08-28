@@ -2,7 +2,7 @@ FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    PYTHONIOENCODING=UTF-8 \
+    PYTHONIOENCODING=UTF-8
 
 # For bitsandbytes
 ENV BNB_GPU_TARGETS="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102"

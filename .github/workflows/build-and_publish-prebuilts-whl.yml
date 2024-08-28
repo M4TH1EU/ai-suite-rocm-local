@@ -36,12 +36,10 @@ jobs:
       - name: Build Docker image
         env:
           ROCM_VERSION: ${{ inputs.rocm_version }}
-          GPU_ARCH: ${{ inputs.gpu_arch }}
           TORCH_VERSION: ${{ inputs.torch_version }}
         run: |
           docker build \
             --build-arg ROCM_VERSION=${ROCM_VERSION} \
-            --build-arg GPU_ARCH=${GPU_ARCH} \
             --build-arg TORCH_VERSION=${TORCH_VERSION} \
             -t prebuilt-wheels ./prebuilts
 
@@ -49,12 +47,10 @@ jobs:
       - name: Run Docker container and generate wheels
         env:
           ROCM_VERSION: ${{ inputs.rocm_version }}
-          GPU_ARCH: ${{ inputs.gpu_arch }}
           TORCH_VERSION: ${{ inputs.torch_version }}
         run: |
           docker create --name prebuilt-container \
             -e ROCM_ARCH=${ROCM_ARCH} \
-            -e GPU_ARCH=${GPU_ARCH} \
             -e TORCH_VERSION=${TORCH_VERSION} \
             prebuilt-wheels
           docker start -a prebuilt-container
@@ -63,14 +59,15 @@ jobs:
       - name: Copy bitsandbytes wheel to host
         run: |
           mkdir -p /tmp/bitsandbytes/dist
-          docker cp prebuilt-container:/tmp/bitsandbytes/dist /tmp/bitsandbytes/dist
-      
+          docker cp prebuilt-container:/tmp/bitsandbytes/dist/ /tmp/bitsandbytes/dist/
+          ls -l /tmp/bitsandbytes/dist/
 
       # Step 6: Copy llama-cpp-python wheel artifact to host
       - name: Copy llama-cpp-python wheel to host
         run: |
           mkdir -p /tmp/llama-cpp-python/dist
-          docker cp prebuilt-container:/tmp/llama-cpp-python/dist /tmp/llama-cpp-python/dist
+          docker cp prebuilt-container:/tmp/llama-cpp-python/dist/ /tmp/llama-cpp-python/dist/
+          ls -l /tmp/llama-cpp-python/dist/
 
       # Step 7: Upload bitsandbytes wheel artifact
       - name: Upload bitsandbytes wheel

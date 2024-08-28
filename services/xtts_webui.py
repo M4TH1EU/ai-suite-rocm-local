@@ -1,11 +1,11 @@
-from services import Stack
+from core.stack import Stack
 
 
-class XTTS(Stack):
+class XttsWebui(Stack):
     def __init__(self):
         super().__init__(
             'XTTS WebUI',
-            'xtts-rocm',
+            'xtts_webui',
             5001,
             'https://github.com/daswer123/xtts-webui'
         )
@@ -35,4 +35,4 @@ class XTTS(Stack):
     def _launch(self):
         args = ["--host", "0.0.0.0", "--port", str(self.port)]
         self.python(f"server.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

@@ -1,11 +1,11 @@
-from services import Stack
+from core.stack import Stack
 
 
-class TextGeneration(Stack):
+class TextGenerationWebui(Stack):
     def __init__(self):
         super().__init__(
             'Text Generation',
-            'text-generation-rocm',
+            'text_generation_webui',
             5000,
             'https://github.com/oobabooga/text-generation-webui/'
         )

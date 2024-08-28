@@ -1,24 +1,24 @@
 import logging
 import os
+import shutil
 import subprocess
 
 import psutil
 
-import main
-import utils
-from main import PYTHON_EXEC, logger, get_config
+from core import utils, config
+from core.vars import logger, PYTHON_EXEC
 
 
 class Stack:
-    def __init__(self, name: str, path: str, port: int, url: str):
+    def __init__(self, name: str, id: str, port: int, url: str):
         self.name = name
-        self.path = os.path.join(os.path.expanduser("~"), ".ai-suite-rocm", path)
+        self.id = id
+        self.path = os.path.join(os.path.expanduser("~"), ".ai-suite-rocm", id)
 
         self.url = url
         self.port = port
 
         self.process = None
-
 
     def install(self):
         self.create_file('.installed', 'true')
@@ -110,18 +110,20 @@ class Stack:
 
         if daemon:
             # Check if previous run process is saved
-            if get_config().has(f"{self.name}-pid"):
+            if config.has(f"{self.name}-pid"):
 
                 # Check if PID still running
-                if psutil.pid_exists(main.config.get(f"{self.name}-pid")):
+                if psutil.pid_exists(config.get(f"{self.name}-pid")):
                     choice = input(f"{self.name} is already running, do you want to restart it? (y/n): ")
 
                     if choice.lower() == 'y':
-                        pid = main.config.get(f"{self.name}-pid")
+                        pid = config.get(f"{self.name}-pid")
                         logger.debug(f"Killing previous daemon with PID: {pid}")
                         psutil.Process(pid).kill()
                     else:
                         # TODO: attach to subprocess?
+                        logger.info("Continuing without restarting...")
+
                         return
                 else:
                     logger.warning(
@@ -131,8 +133,8 @@ class Stack:
 
             logger.debug(f"Starting {self.name} as daemon with command: {cmd}")
             cmd = f"{cmd} &"
-            process = subprocess.Popen(cmd, shell=True)
-            get_config().set(f"{self.name}-pid", process.pid + 1)
+            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            config.set(f"{self.name}-pid", process.pid + 1)
             return
         else:
             logger.debug(f"Running command: {cmd}")
@@ -185,7 +187,7 @@ class Stack:
 
     def remove_dir(self, name):
         logger.debug(f"Removing directory {name}")
-        os.rmdir(os.path.join(self.path, name))
+        shutil.rmtree(os.path.join(self.path, name))
 
     def move_file_or_dir(self, src, dest):
         logger.debug(f"Moving file/dir {src} to {dest}")

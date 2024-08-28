@@ -1,11 +1,11 @@
-from services import Stack
+from core.stack import Stack
 
 
-class ComfyUI(Stack):
+class ComfyUi(Stack):
     def __init__(self):
         super().__init__(
             'ComfyUI',
-            'comfyui-rocm',
+            'comfy_ui',
             5004,
             'https://github.com/comfyanonymous/ComfyUI.git'
         )
@@ -31,4 +31,4 @@ class ComfyUI(Stack):
     def _launch(self):
         args = ["--port", str(self.port)]
         self.python(f"main.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

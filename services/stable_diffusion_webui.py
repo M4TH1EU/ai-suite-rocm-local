@@ -1,18 +1,18 @@
-from services import Stack
+from core.stack import Stack
 
 
-class StableDiffusionForge(Stack):
+class StableDiffusionWebui(Stack):
     def __init__(self):
         super().__init__(
-            'StableDiffusion Forge WebUI',
-            'stablediffusion-forge-rocm',
-            5003,
-            'https://github.com/lllyasviel/stable-diffusion-webui-forge'
+            'StableDiffusion WebUI',
+            'stable_diffusion_webui',
+            5002,
+            'https://github.com/AUTOMATIC1111/stable-diffusion-webui'
         )
 
     def install(self):
         # Install the webui
-        self.git_clone(url=self.url, dest="webui")
+        self.git_clone(url=self.url, branch="dev", dest="webui")
 
         self.python("launch.py --skip-torch-cuda-test --exit", current_dir="webui")
 
@@ -24,4 +24,4 @@ class StableDiffusionForge(Stack):
     def _launch(self):
         args = ["--listen", "--enable-insecure-extension-access", "--port", str(self.port)]
         self.python(f"launch.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

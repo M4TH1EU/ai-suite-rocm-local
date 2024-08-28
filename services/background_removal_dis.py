@@ -1,11 +1,11 @@
-from services import Stack
+from core.stack import Stack
 
 
-class BGRemovalDIS(Stack):
+class BackgroundRemovalDis(Stack):
     def __init__(self):
         super().__init__(
-            'BGRemovalDIS',
-            'bg-remove-dis-rocm',
+            'Background Removal (DIS)',
+            'background_removal_dis',
             5005,
             'https://huggingface.co/spaces/ECCV2022/dis-background-removal'
         )
@@ -31,4 +31,4 @@ class BGRemovalDIS(Stack):
     def _launch(self):
         args = ["--port", str(self.port)]
         self.python(f"app.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

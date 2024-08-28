@@ -32,7 +32,7 @@ class XTTS(Stack):
 
         super().install()
 
-    def start(self):
+    def _launch(self):
         args = ["--host", "0.0.0.0", "--port", str(self.port)]
         self.python(f"server.py {' '.join(args)}", current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])

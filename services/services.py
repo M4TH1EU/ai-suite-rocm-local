@@ -2,25 +2,23 @@ import logging
 import os
 import subprocess
 
+import psutil
+
+import main
 import utils
-from main import PATH, PYTHON_EXEC, logger, LEVEL
+from main import PYTHON_EXEC, logger, get_config
 
 
 class Stack:
     def __init__(self, name: str, path: str, port: int, url: str):
         self.name = name
-        self.path = os.path.join(PATH, path)
+        self.path = os.path.join(os.path.expanduser("~"), ".ai-suite-rocm", path)
+
         self.url = url
         self.port = port
 
         self.process = None
 
-        if self.is_installed():
-            self.update()
-        else:
-            self.check_for_broken_install()
-            self.create_venv()
-            self.install()
 
     def install(self):
         self.create_file('.installed', 'true')
@@ -30,10 +28,14 @@ class Stack:
         return self.file_exists('.installed')
 
     def check_for_broken_install(self):
-        if not self.is_installed() and len(os.listdir(self.path)) > 0:
-            logger.warning("Found files from a previous/borked/crashed installation, cleaning up...")
-            self.bash(f"rm -rf {self.path}")
-            self.create_dir('')
+        if not self.is_installed():
+            if os.path.exists(self.path):
+                if len(os.listdir(self.path)) > 0:
+                    logger.warning("Found files from a previous/borked/crashed installation, cleaning up...")
+                    self.bash(f"rm -rf {self.path}")
+                    self.create_dir('')
+            else:
+                self.create_dir('')
 
     def update(self, folder: str = 'webui'):
         if self.dir_exists(folder):
@@ -46,6 +48,16 @@ class Stack:
         self.bash(f"rm -rf {self.path}")
 
     def start(self):
+        if self.is_installed():
+            self.update()
+        else:
+            self.check_for_broken_install()
+            self.create_venv()
+            self.install()
+
+        self._launch()
+
+    def _launch(self):
         pass
 
     def stop(self):
@@ -55,61 +67,94 @@ class Stack:
         self.stop()
         self.start()
 
-    def status(self):
+    def status(self) -> bool:
         pass
 
     # Python/Bash utils
     def create_venv(self):
         venv_path = os.path.join(self.path, 'venv')
         if not self.has_venv():
-            logger.debug(f"Creating venv for {self.name}")
+            logger.info(f"Creating venv for {self.name}")
             self.bash(f"{PYTHON_EXEC} -m venv {venv_path} --system-site-packages")
-            self.pip("install --upgrade pip")
+            self.pip_install("pip")
         else:
             logger.debug(f"Venv already exists for {self.name}")
 
     def has_venv(self) -> bool:
         return self.dir_exists('venv')
 
-    def pip_install(self, package: str | list, no_deps: bool = False):
+    def pip_install(self, package: str | list, no_deps: bool = False, env=[], args=[]):
+        if no_deps:
+            args.append("--no-deps")
+
         if isinstance(package, list):
             for p in package:
-                self.pip(f"install -U {p} {'--no-deps' if no_deps else ''}")
+                logger.info(f"Installing {p}")
+                self.pip(f"install -U {p}", env=env, args=args)
         else:
-            self.pip(f"install -U {package} {'--no-deps' if no_deps else ''}")
+            logger.info(f"Installing {package}")
+            self.pip(f"install -U {package}", env=env, args=args)
 
-    def install_requirements(self, filename: str = 'requirements.txt'):
-        self.pip(f"install -r {filename}")
+    def install_requirements(self, filename: str = 'requirements.txt', env=[]):
+        logger.info(f"Installing requirements for {self.name} ({filename})")
+        self.pip(f"install -r {filename}", env=env)
 
-    def pip(self, cmd: str, env=[], current_dir: str = None):
-        self.bash(f"{' '.join(env)} {self.path}/venv/bin/pip {cmd}", current_dir)
+    def pip(self, cmd: str, env=[], args=[], current_dir: str = None):
+        self.bash(f"{' '.join(env)} {self.path}/venv/bin/pip {cmd} {' '.join(args)}", current_dir)
 
-    def python(self, cmd: str, env=[], current_dir: str = None):
-        self.bash(f"{' '.join(env)} {self.path}/venv/bin/python {cmd}", current_dir)
+    def python(self, cmd: str, env=[], current_dir: str = None, daemon: bool = False):
+        self.bash(f"{' '.join(env)} {self.path}/venv/bin/python {cmd}", current_dir, daemon)
 
-    def bash(self, cmd: str, current_dir: str = None):
+    def bash(self, cmd: str, current_dir: str = None, daemon: bool = False):
         cmd = f"cd {self.path if current_dir is None else os.path.join(self.path, current_dir)} && {cmd}"
 
-        logger.debug(f"Running command: {cmd}")
+        if daemon:
+            # Check if previous run process is saved
+            if get_config().has(f"{self.name}-pid"):
 
-        if LEVEL == logging.DEBUG:
+                # Check if PID still running
+                if psutil.pid_exists(main.config.get(f"{self.name}-pid")):
+                    choice = input(f"{self.name} is already running, do you want to restart it? (y/n): ")
+
+                    if choice.lower() == 'y':
+                        pid = main.config.get(f"{self.name}-pid")
+                        logger.debug(f"Killing previous daemon with PID: {pid}")
+                        psutil.Process(pid).kill()
+                    else:
+                        # TODO: attach to subprocess?
+                        return
+                else:
+                    logger.warning(
+                        f"Previous PID found for {self.name} but process is not running, continuing as stopped...")
+            else:
+                logger.debug(f"No previous PID found for {self.name}, continuing as stopped...")
+
+            logger.debug(f"Starting {self.name} as daemon with command: {cmd}")
+            cmd = f"{cmd} &"
             process = subprocess.Popen(cmd, shell=True)
-            process.wait()
-            if process.returncode != 0:
-                raise Exception(f"Failed to run command: {cmd}")
-
+            get_config().set(f"{self.name}-pid", process.pid + 1)
+            return
         else:
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            out, err = process.communicate()
+            logger.debug(f"Running command: {cmd}")
 
-            if process.returncode != 0:
-                logger.fatal(f"Failed to run command: {cmd}")
-                logger.fatal(f"Error: {err.decode('utf-8')}")
-                logger.fatal(f"Output: {out.decode('utf-8')}")
-                raise Exception(f"Failed to run command: {cmd}")
+            if logger.level == logging.DEBUG:
+                process = subprocess.Popen(cmd, shell=True)
+                process.wait()
+                if process.returncode != 0:
+                    raise Exception(f"Failed to run command: {cmd}")
+            else:
+                process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                out, err = process.communicate()
+
+                if process.returncode != 0:
+                    logger.fatal(f"Failed to run command: {cmd}")
+                    logger.fatal(f"Error: {err.decode('utf-8')}")
+                    logger.fatal(f"Output: {out.decode('utf-8')}")
+                    raise Exception(f"Failed to run command: {cmd}")
 
     # Git utils
     def git_clone(self, url: str, branch: str = None, dest: str = None):
+        logger.info(f"Cloning {url}")
         self.bash(f"git clone {f"-b {branch}" if branch is not None else ''} {url} {'' if dest is None else dest}")
 
     def git_pull(self, repo_folder: str, force: bool = False):
@@ -128,6 +173,9 @@ class Stack:
             f.write(content)
 
     def create_dir(self, name):
+        if name == '':
+            logger.info(f"Creating directory for {self.name}")
+
         logger.debug(f"Creating directory {name}")
         os.makedirs(os.path.join(self.path, name), exist_ok=True)
 

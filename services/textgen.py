@@ -12,10 +12,10 @@ class TextGeneration(Stack):
 
     def install(self):
         # Install LlamaCpp from prebuilt
-        self.pip("install llama-cpp-python", ["CMAKE_ARGS=\"-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS\""])  # cpu
+        self.pip_install("llama-cpp-python", env=["CMAKE_ARGS=\"-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS\""])  # cpu
 
         # Install LlamaCpp for ROCM from source
-        # self.pip("install llama-cpp-python", ["CMAKE_ARGS=\"-DGGML_HIPBLAS=on\" FORCE_CMAKE=1"]) # manual gpu (only works if whole rocm suite installed)
+        # self.pip_install("llama-cpp-python", env=["CMAKE_ARGS=\"-DGGML_HIPBLAS=on\" FORCE_CMAKE=1"]) # manual gpu (only works if whole rocm suite installed)
         # self.install_from_prebuilt("llama_cpp_python") # gpu (only works if whole rocm suite installed)
 
         # Install Triton for ROCM from prebuilt
@@ -45,12 +45,12 @@ class TextGeneration(Stack):
         self.pip_install(
             "https://github.com/turboderp/exllamav2/releases/download/v0.1.9/exllamav2-0.1.9+rocm6.1.torch2.4.0-cp310-cp310-linux_x86_64.whl")
         self.install_from_prebuilt("bitsandbytes")
-        self.pip(
-            "install auto-gptq --no-build-isolation --extra-index-url https://huggingface.github.io/autogptq-index/whl/rocm573/")
+        self.pip_install("auto-gptq", args=["--no-build-isolation", "--extra-index-url",
+                                            "https://huggingface.github.io/autogptq-index/whl/rocm573/"])
 
         super().install()
 
-    def start(self):
+    def _launch(self):
         args = ["--listen", "--listen-port", str(self.port)]
         self.python(f"server.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

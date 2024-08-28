@@ -28,7 +28,7 @@ class BGRemovalDIS(Stack):
 
         super().install()
 
-    def start(self):
+    def _launch(self):
         args = ["--port", str(self.port)]
         self.python(f"app.py {' '.join(args)}", current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"])

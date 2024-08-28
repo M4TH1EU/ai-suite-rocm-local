@@ -1,1 +1,3 @@
 .idea/
+prebuilts/build_output/
+__pycache__/

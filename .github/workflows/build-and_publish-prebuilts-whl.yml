@@ -31,6 +31,9 @@ jobs:
       # Step 3: Build the Docker image
       - name: Build Docker image
         run: |
+          echo ${{ inputs.rocm_version }}
+          echo ${{ inputs.torch_version }}
+          
           docker build \
             --build-arg ROCM_VERSION=${{ inputs.rocm_version }} \
             --build-arg TORCH_VERSION=${{ inputs.torch_version }} \

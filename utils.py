@@ -6,7 +6,6 @@ from main import ROCM_VERSION, logger
 
 def get_prebuilts(repo_owner: str = "M4TH1EU", repo_name: str = "ai-suite-rocm-local",
                   release_tag: str = f"prebuilt-whl-{ROCM_VERSION}") -> list:
-
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/tags/{release_tag}"
 
     try:

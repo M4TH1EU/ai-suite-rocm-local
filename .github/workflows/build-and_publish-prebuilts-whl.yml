@@ -1,0 +1,86 @@
+name: Build and Publish Artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      rocm_version:
+        description: 'ROCm version'
+        required: true
+        default: '6.1.2'
+      gpu_arch:
+        description: 'GPU architecture (e.g., gfx1030)'
+        required: true
+        default: 'gfx1030'
+      torch_version:
+        description: 'Torch version (e.g., rocm6.1)'
+        required: true
+        default: 'rocm6.1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Build the Docker image
+      - name: Build Docker image
+        env:
+          ROCM_VERSION: ${{ inputs.rocm_version }}
+          GPU_ARCH: ${{ inputs.gpu_arch }}
+          TORCH_VERSION: ${{ inputs.torch_version }}
+        run: |
+          docker build \
+            --build-arg ROCM_VERSION=${ROCM_VERSION} \
+            --build-arg GPU_ARCH=${GPU_ARCH} \
+            --build-arg TORCH_VERSION=${TORCH_VERSION} \
+            -t prebuilt-wheels ./prebuilts
+
+      # Step 4: Create a container and run the script
+      - name: Run Docker container and generate wheels
+        env:
+          ROCM_VERSION: ${{ inputs.rocm_version }}
+          GPU_ARCH: ${{ inputs.gpu_arch }}
+          TORCH_VERSION: ${{ inputs.torch_version }}
+        run: |
+          docker create --name prebuilt-container \
+            -e ROCM_ARCH=${ROCM_ARCH} \
+            -e GPU_ARCH=${GPU_ARCH} \
+            -e TORCH_VERSION=${TORCH_VERSION} \
+            prebuilt-wheels
+          docker start -a prebuilt-container
+
+      # Step 5: Copy bitsandbytes wheel artifact to host
+      - name: Copy bitsandbytes wheel to host
+        run: |
+          docker cp prebuilt-container:/tmp/bitsandbytes/dist /tmp/bitsandbytes/dist
+
+      # Step 6: Copy llama-cpp-python wheel artifact to host
+      - name: Copy llama-cpp-python wheel to host
+        run: |
+          docker cp prebuilt-container:/tmp/llama-cpp-python/dist /tmp/llama-cpp-python/dist
+
+      # Step 7: Upload bitsandbytes wheel artifact
+      - name: Upload bitsandbytes wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: bitsandbytes-wheels
+          path: /tmp/bitsandbytes/dist/*.whl
+
+      # Step 8: Upload llama-cpp-python wheel artifact
+      - name: Upload llama-cpp-python wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: llama-cpp-python-wheels
+          path: /tmp/llama-cpp-python/dist/*.whl
+
+      # Step 9: Cleanup Docker container
+      - name: Cleanup
+        run: |
+          docker rm prebuilt-container

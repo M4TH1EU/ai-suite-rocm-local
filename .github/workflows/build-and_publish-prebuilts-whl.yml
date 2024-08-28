@@ -7,10 +7,6 @@ on:
         description: 'ROCm version'
         required: true
         default: '6.1.2'
-      gpu_arch:
-        description: 'GPU architecture (e.g., gfx1030)'
-        required: true
-        default: 'gfx1030'
       torch_version:
         description: 'Torch version (e.g., rocm6.1)'
         required: true

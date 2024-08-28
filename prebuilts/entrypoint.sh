@@ -2,7 +2,7 @@
 
 # ROCM bitsandbytes
 ## Clone repo and install python requirements
-git clone --depth 1 -b multi-backend-refactor https://github.com/bitsandbytes-foundation/bitsandbytes.git
+git clone --depth 1 -b multi-backend-refactor https://github.com/bitsandbytes-foundation/bitsandbytes.git /tmp/bitsandbytes
 cd /tmp/bitsandbytes
 pip3 install -r requirements-dev.txt
 ## Build
@@ -13,6 +13,6 @@ python3.10 setup.py bdist_wheel --universal
 
 # ROCM llama-cpp-python
 ## Clone repo and install python requirements
-git clone --recurse-submodules https://github.com/abetlen/llama-cpp-python.git
+git clone --recurse-submodules https://github.com/abetlen/llama-cpp-python.git /tmp/llama-cpp-python
 cd /tmp/llama-cpp-python
 CMAKE_ARGS="-DGGML_HIPBLAS=on" python3.10 -m build --wheel

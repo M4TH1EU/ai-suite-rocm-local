@@ -1,5 +1,6 @@
 ARG ROCM_VERSION=6.1.2
-FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
+FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}-complete
+# also works without -complete for specific arch (tested on gfx1030)
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -10,6 +11,8 @@ ENV BNB_GPU_TARGETS="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;
 # For LLAMA
 ENV GPU_TARGETS="gfx803 gfx900 gfx906 gfx908 gfx90a gfx1010 gfx1030 gfx1100 gfx1101"
 
+ENV CC=/opt/rocm/llvm/bin/clang
+ENV CXX=/opt/rocm/llvm/bin/clang++
 
 WORKDIR /tmp
 

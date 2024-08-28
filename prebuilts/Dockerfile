@@ -1,5 +1,5 @@
 ARG ROCM_VERSION=6.1.2
-FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}-complete
+FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
 # also works without -complete for specific arch (tested on gfx1030)
 
 ENV DEBIAN_FRONTEND=noninteractive \

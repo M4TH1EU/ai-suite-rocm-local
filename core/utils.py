@@ -63,7 +63,9 @@ def run_command(command: str, exit_on_error: bool = True):
 
     if process.returncode != 0:
         logger.fatal(f"Failed to run command: {command}")
-        raise Exception(f"Failed to run command: {command}")
+
+        if exit_on_error:
+            raise Exception(f"Failed to run command: {command}")
 
     return out, err, process.returncode
 
@@ -71,13 +73,9 @@ def run_command(command: str, exit_on_error: bool = True):
 def load_service_from_string(service: str) -> Stack:
     logger.debug(f"Loading service from string: {service}")
 
-    try:
-        service_name = service.replace("_", " ").title().replace(" ", "")
+    service_name = service.replace("_", " ").title().replace(" ", "")
 
-        module = importlib.import_module(f"services.{service}")
-        met = getattr(module, service_name)
-        return met()
+    module = importlib.import_module(f"services.{service}")
+    met = getattr(module, service_name)
+    return met()
 
-    except ModuleNotFoundError as e:
-        logger.error(f"Failed to load service: {e}")
-        return None

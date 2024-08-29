@@ -81,7 +81,6 @@ class Stack:
                 self.start()
         else:
             logger.warning(f"Could not update {self.name} as {self.name} is not installed")
-            choices.any_key.ask()
 
     def _update(self):
         pass
@@ -100,7 +99,6 @@ class Stack:
             self._start()
         else:
             logger.error(f"{self.name} is not installed")
-            choices.any_key.ask()
 
     def _start(self):
         pass

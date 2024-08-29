@@ -2,7 +2,7 @@ import os
 
 import questionary
 
-from core.vars import logger, loaded_services
+from core.vars import loaded_services
 from ui import choices
 from ui.choices import update_choices
 
@@ -19,12 +19,15 @@ def handle_services(action, service):
 
     service = loaded_services[service]
     if action == "start":
+        questionary.print(f"Starting {service.name}...")
         service.start()
     elif action == "stop":
+        questionary.print(f"Stopping {service.name}...")
         service.stop()
     elif action == "install":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
+            questionary.print(f"Installing {service.name}...")
             service.install()
     elif action == "uninstall":
         confirmation = choices.are_you_sure.ask()
@@ -34,9 +37,9 @@ def handle_services(action, service):
             value = type_confirmation.ask()
 
             if value == "cancel":
-                questionary.print("Canceled", style="fg:ansired")
+                questionary.print("Canceled", style="fg:ansired bold")
             elif value != service.id:
-                questionary.print("Invalid input, please try again", style="fg:ansired")
+                questionary.print("Invalid input, please try again", style="fg:ansired bold")
             elif value == service.id:
                 service.uninstall()
 

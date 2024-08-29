@@ -28,12 +28,15 @@ def write():
         json.dump(data, f)
 
 
-def get(key: str):
+def get(key: str, default=None):
     global data
+    if key not in data:
+        return default
+
     return data.get(key)
 
 
-def set(key: str, value):
+def put(key: str, value):
     global data
     data[key] = value
     write()
@@ -46,7 +49,8 @@ def has(key: str):
 
 def remove(key: str):
     global data
-    data.pop(key)
+    if key in data:
+        data.pop(key)
     write()
 
 
@@ -54,3 +58,24 @@ def clear():
     global data
     data = {}
     write()
+
+
+def create_file(filename: str, content: str):
+    with open(os.path.join(os.path.dirname(file), filename), "w") as f:
+        f.write(content)
+
+
+def remove_file(filename: str):
+    os.remove(os.path.join(os.path.dirname(file), filename))
+
+
+def file_exists(filename: str):
+    return os.path.exists(os.path.join(os.path.dirname(file), filename))
+
+
+def get_file_path(filename: str):
+    return os.path.join(os.path.dirname(file), filename)
+
+
+def open_file(filename: str, mode: str = 'w'):
+    return open(os.path.join(os.path.dirname(file), filename), mode)

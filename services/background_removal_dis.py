@@ -29,6 +29,5 @@ class BackgroundRemovalDis(Stack):
         super().install()
 
     def _launch(self):
-        args = ["--port", str(self.port)]
-        self.python(f"app.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)
+        self.python(f"app.py", current_dir="webui",
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0", f"GRADIO_SERVER_PORT={self.port}"], daemon=True)

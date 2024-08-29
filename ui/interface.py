@@ -60,6 +60,6 @@ def run_interactive_cmd_ui():
             service = choices.uninstall_service.ask()
             handle_services("uninstall", service)
 
-        elif choice == "Exit":
+        elif choice == "exit":
             print("Exiting...")
             exit(0)

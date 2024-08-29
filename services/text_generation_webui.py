@@ -52,5 +52,5 @@ class TextGenerationWebui(Stack):
 
     def _launch(self):
         args = ["--listen", "--listen-port", str(self.port)]
-        self.python(f"server.py {' '.join(args)}", current_dir="webui",
+        self.python(f"server.py", args=args, current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

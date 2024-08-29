@@ -30,5 +30,5 @@ class ComfyUi(Stack):
 
     def _launch(self):
         args = ["--port", str(self.port)]
-        self.python(f"main.py {' '.join(args)}", current_dir="webui",
+        self.python(f"main.py", args=args, current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

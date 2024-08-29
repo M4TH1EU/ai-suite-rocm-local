@@ -34,5 +34,5 @@ class XttsWebui(Stack):
 
     def _launch(self):
         args = ["--host", "0.0.0.0", "--port", str(self.port)]
-        self.python(f"server.py {' '.join(args)}", current_dir="webui",
-                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)
+        self.python(f"server.py", current_dir="webui",
+                    env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], args=args, daemon=True)

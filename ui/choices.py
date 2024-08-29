@@ -10,10 +10,11 @@ install_service = None
 uninstall_service = None
 are_you_sure = None
 any_key = None
+already_running = None
 
 
 def update_choices():
-    global start, start_service, stop_service, install_service, uninstall_service, are_you_sure, any_key
+    global start, start_service, stop_service, install_service, uninstall_service, are_you_sure, any_key, already_running
 
     start = questionary.select(
         "Choose an option:",
@@ -49,5 +50,7 @@ def update_choices():
     )
 
     are_you_sure = questionary.confirm("Are you sure?")
+
+    already_running = questionary.confirm("Service is already running, do you want to restart it?")
 
     any_key = questionary.text("Press any key to continue")

@@ -2,11 +2,30 @@ import logging
 import os
 import shutil
 import subprocess
+import time
 
 import psutil
 
 from core import utils, config
 from core.vars import logger, PYTHON_EXEC
+from ui import choices
+
+
+def find_correct_pid(parent_pid: int) -> int:
+    processes: list[psutil.Process] = [psutil.Process(parent_pid)]
+    create_time = processes[0].create_time()
+
+    time.sleep(0.5)  # Wait for child processes to spawn
+
+    for i in range(1, 10):
+        if psutil.pid_exists(processes[0].pid + i):
+            child_process = psutil.Process(processes[0].pid + i)
+            if child_process.create_time() - create_time < 1:
+                processes.append(psutil.Process(processes[0].pid + i))
+        else:
+            time.sleep(0.5 / i)
+
+    return processes[-1].pid
 
 
 class Stack:
@@ -18,7 +37,7 @@ class Stack:
         self.url = url
         self.port = port
 
-        self.process = None
+        self.pid = config.get(f"{self.name}-pid")
 
     def install(self):
         self.create_file('.installed', 'true')
@@ -61,14 +80,28 @@ class Stack:
         pass
 
     def stop(self):
-        pass
+        if self.status():
+            logger.debug(f"Killing {self.name} with PID: {self.pid}")
+            psutil.Process(self.pid).kill()
+
+        self.set_pid(None)
+
+    def set_pid(self, pid):
+        self.pid = pid
+        if pid is not None:
+            config.put(f"{self.name}-pid", pid)
+        else:
+            config.remove(f"{self.name}-pid")
 
     def restart(self):
         self.stop()
         self.start()
 
     def status(self) -> bool:
-        pass
+        if self.pid is None:
+            return False
+
+        return psutil.pid_exists(self.pid)
 
     # Python/Bash utils
     def create_venv(self):
@@ -100,42 +133,34 @@ class Stack:
         self.pip(f"install -r {filename}", env=env)
 
     def pip(self, cmd: str, env=[], args=[], current_dir: str = None):
-        self.bash(f"{' '.join(env)} {self.path}/venv/bin/pip {cmd} {' '.join(args)}", current_dir)
+        self.python(f"-m pip {cmd}", env=env, args=args, current_dir=current_dir)
 
-    def python(self, cmd: str, env=[], current_dir: str = None, daemon: bool = False):
-        self.bash(f"{' '.join(env)} {self.path}/venv/bin/python {cmd}", current_dir, daemon)
+    def python(self, cmd: str, env=[], args=[], current_dir: str = None, daemon: bool = False):
+        self.bash(f"{' '.join(env)} {self.path}/venv/bin/python {cmd} {' '.join(args)}", current_dir, daemon)
 
     def bash(self, cmd: str, current_dir: str = None, daemon: bool = False):
         cmd = f"cd {self.path if current_dir is None else os.path.join(self.path, current_dir)} && {cmd}"
 
         if daemon:
-            # Check if previous run process is saved
-            if config.has(f"{self.name}-pid"):
+            if self.status():
+                choice = choices.already_running.ask()
 
-                # Check if PID still running
-                if psutil.pid_exists(config.get(f"{self.name}-pid")):
-                    choice = input(f"{self.name} is already running, do you want to restart it? (y/n): ")
-
-                    if choice.lower() == 'y':
-                        pid = config.get(f"{self.name}-pid")
-                        logger.debug(f"Killing previous daemon with PID: {pid}")
-                        psutil.Process(pid).kill()
-                    else:
-                        # TODO: attach to subprocess?
-                        logger.info("Continuing without restarting...")
-
-                        return
+                if choice is True:
+                    self.stop()
+                    self._launch()
+                    return
                 else:
-                    logger.warning(
-                        f"Previous PID found for {self.name} but process is not running, continuing as stopped...")
+                    # TODO: attach to subprocess / redirect logs?
+                    logger.info("Continuing without restarting...")
+                    return
             else:
-                logger.debug(f"No previous PID found for {self.name}, continuing as stopped...")
-
-            logger.debug(f"Starting {self.name} as daemon with command: {cmd}")
-            cmd = f"{cmd} &"
-            process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            config.set(f"{self.name}-pid", process.pid + 1)
-            return
+                logger.debug(f"Running command as daemon: {cmd}")
+                cmd = f"{cmd} &"
+                process = subprocess.Popen(cmd, shell=True, preexec_fn=os.setpgrp,
+                                           stdout=config.open_file(f"{self.id}-stdout"),
+                                           stderr=config.open_file(f"{self.id}-stderr"))
+                self.set_pid(find_correct_pid(process.pid))
+                return
         else:
             logger.debug(f"Running command: {cmd}")
 

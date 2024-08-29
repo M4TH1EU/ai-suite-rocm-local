@@ -4,6 +4,7 @@ import questionary
 
 from core.vars import logger, loaded_services
 from ui import choices
+from ui.choices import update_choices
 
 
 def clear_terminal():
@@ -23,11 +24,11 @@ def handle_services(action, service):
     elif action == "stop":
         logger.info(f"Stopping service: {service.name}")
         service.stop()
-    elif action == "update":
+    elif action == "install":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
             logger.info(f"Installing/updating service: {service.name}")
-            service.update()
+            service.install()
     elif action == "uninstall":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
@@ -42,6 +43,7 @@ def handle_services(action, service):
 def run_interactive_cmd_ui():
     while True:
         clear_terminal()
+        update_choices()
         choice = choices.start.ask()
 
         if choice == "Start service":
@@ -54,7 +56,7 @@ def run_interactive_cmd_ui():
 
         elif choice == "Install/update service":
             service = choices.install_service.ask()
-            handle_services("update", service)
+            handle_services("install", service)
 
         elif choice == "Uninstall service":
             service = choices.uninstall_service.ask()

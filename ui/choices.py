@@ -26,7 +26,9 @@ def update_choices():
             Choice("exit")
         ])
 
-    _services_choices = [Choice(service.name, value=service.id) for service in loaded_services.values()]
+    _services_choices = [Choice(f"{service.name} [{'ON' if service.status() else 'OFF'}]", value=service.id) for service
+                         in loaded_services.values()]
+
     _services_choices.append(Choice("go back", value="back"))
 
     start_service = questionary.select(

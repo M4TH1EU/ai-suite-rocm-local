@@ -10,7 +10,7 @@ class XttsWebui(Stack):
             'https://github.com/daswer123/xtts-webui'
         )
 
-    def install(self):
+    def _install(self):
         # Install the webui
         self.git_clone(url=self.url, dest="webui")
 
@@ -30,9 +30,7 @@ class XttsWebui(Stack):
         # Deepspeed and ninja (not working yet)
         # self.pip_install(["ninja", "deepspeed"])
 
-        super().install()
-
-    def _launch(self):
+    def _start(self):
         args = ["--host", "0.0.0.0", "--port", str(self.port)]
         self.python(f"server.py", current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], args=args, daemon=True)

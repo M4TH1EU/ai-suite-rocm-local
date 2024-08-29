@@ -10,7 +10,7 @@ class BackgroundRemovalDis(Stack):
             'https://huggingface.co/spaces/ECCV2022/dis-background-removal'
         )
 
-    def install(self):
+    def _install(self):
         self.git_clone(url=self.url, dest="webui")
         self.install_requirements("webui/requirements.txt")
         self.pip_install("gradio")  # gradio is not in requirements.txt for some reason
@@ -26,8 +26,6 @@ class BackgroundRemovalDis(Stack):
 
         # self.remove_dir("webui/.git") # saves a lot of space due to big repo
 
-        super().install()
-
-    def _launch(self):
+    def _start(self):
         self.python(f"app.py", current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0", f"GRADIO_SERVER_PORT={self.port}"], daemon=True)

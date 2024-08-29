@@ -10,7 +10,7 @@ class TextGenerationWebui(Stack):
             'https://github.com/oobabooga/text-generation-webui/'
         )
 
-    def install(self):
+    def _install(self):
         # Install LlamaCpp from prebuilt
         self.pip_install("llama-cpp-python", env=["CMAKE_ARGS=\"-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS\""])  # cpu
 
@@ -48,9 +48,7 @@ class TextGenerationWebui(Stack):
         self.pip_install("auto-gptq", args=["--no-build-isolation", "--extra-index-url",
                                             "https://huggingface.github.io/autogptq-index/whl/rocm573/"])
 
-        super().install()
-
-    def _launch(self):
+    def _start(self):
         args = ["--listen", "--listen-port", str(self.port)]
         self.python(f"server.py", args=args, current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

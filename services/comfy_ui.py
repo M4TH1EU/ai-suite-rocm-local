@@ -10,7 +10,7 @@ class ComfyUi(Stack):
             'https://github.com/comfyanonymous/ComfyUI.git'
         )
 
-    def install(self):
+    def _install(self):
         # Install the webui
         self.git_clone(url=self.url, dest="webui")
         self.install_requirements("webui/requirements.txt")
@@ -26,9 +26,7 @@ class ComfyUi(Stack):
         self.git_clone(url="https://github.com/comfyanonymous/ComfyUI_bitsandbytes_NF4.git",
                        dest="webui/custom_nodes/ComfyUI_bitsandbytes_NF4")
 
-        super().install()
-
-    def _launch(self):
+    def _start(self):
         args = ["--port", str(self.port)]
         self.python(f"main.py", args=args, current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

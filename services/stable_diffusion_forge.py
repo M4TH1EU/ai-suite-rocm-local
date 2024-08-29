@@ -10,7 +10,7 @@ class StableDiffusionForge(Stack):
             'https://github.com/lllyasviel/stable-diffusion-webui-forge'
         )
 
-    def install(self):
+    def _install(self):
         # Install the webui
         self.git_clone(url=self.url, dest="webui")
 
@@ -19,9 +19,7 @@ class StableDiffusionForge(Stack):
         # Add NF4 support for Flux
         self.install_from_prebuilt("bitsandbytes")
 
-        super().install()
-
-    def _launch(self):
+    def _start(self):
         args = ["--listen", "--enable-insecure-extension-access", "--port", str(self.port)]
         self.python(f"launch.py", args=args, current_dir="webui",
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

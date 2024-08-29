@@ -39,9 +39,17 @@ class Stack:
 
         self.pid = config.get(f"{self.name}-pid")
 
+
     def install(self):
+        self.check_for_broken_install()
+        self.create_venv()
+        self._install()
+
         self.create_file('.installed', 'true')
         logger.info(f"Installed {self.name}")
+
+    def _install(self):
+        pass
 
     def is_installed(self):
         return self.file_exists('.installed')
@@ -57,26 +65,25 @@ class Stack:
                 self.create_dir('')
 
     def update(self, folder: str = 'webui'):
-        if self.dir_exists(folder):
+        if self.is_installed():
             logger.info(f"Updating {self.name}")
             self.git_pull(folder)
         else:
-            logger.warning(f"Could not update {self.name} as {folder} does not exist")
+            logger.warning(f"Could not update {self.name} as {self.name} is not installed")
+            choices.any_key.ask()
 
     def uninstall(self):
+        logger.info(f"Uninstalling {self.name}")
         self.bash(f"rm -rf {self.path}")
 
     def start(self):
         if self.is_installed():
-            self.update()
+            self._start()
         else:
-            self.check_for_broken_install()
-            self.create_venv()
-            self.install()
+            logger.error(f"{self.name} is not installed")
+            choices.any_key.ask()
 
-        self._launch()
-
-    def _launch(self):
+    def _start(self):
         pass
 
     def stop(self):
@@ -147,7 +154,7 @@ class Stack:
 
                 if choice is True:
                     self.stop()
-                    self._launch()
+                    self._start()
                     return
                 else:
                     # TODO: attach to subprocess / redirect logs?

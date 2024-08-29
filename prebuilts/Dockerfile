@@ -9,18 +9,22 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # For bitsandbytes
 ENV BNB_GPU_TARGETS="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1010;gfx1030;gfx1100;gfx1101;gfx1102"
 # For LLAMA
-#ARG ROCM_DOCKER_ARCH=\
-#    gfx803 \
-#    gfx900 \
-#    gfx906 \
-#    gfx908 \
-#    gfx90a \
-#    gfx1010 \
-#    gfx1030 \
-#    gfx1100 \
-#    gfx1101 \
-#    gfx1102
-ARG ROCM_DOCKER_ARCH="gfx803 gfx 900 gfx906 gfx908 gfx90a gfx1010 gfx1030 gfx1100 gfx1101 gfx1102"
+# Synthax error but works
+ARG ROCM_DOCKER_ARCH=\
+    gfx803 \
+    gfx900 \
+    gfx906 \
+    gfx908 \
+    gfx90a \
+    gfx1010 \
+    gfx1030 \
+    gfx1100 \
+    gfx1101 \
+    gfx1102
+# no synthax error but doesn't work for some reason (error on llama compile)??
+# CMake Error: The source directory "/tmp/llama-cpp-python/gfx1102" does not exist.
+# ARG ROCM_DOCKER_ARCH="gfx803 gfx 900 gfx906 gfx908 gfx90a gfx1010 gfx1030 gfx1100 gfx1101 gfx1102"
+
 ENV GPU_TARGETS=${ROCM_DOCKER_ARCH}
 
 ENV CC=/opt/rocm/llvm/bin/clang

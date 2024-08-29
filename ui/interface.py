@@ -19,22 +19,25 @@ def handle_services(action, service):
 
     service = loaded_services[service]
     if action == "start":
-        logger.info(f"Starting service: {service.name}")
         service.start()
     elif action == "stop":
-        logger.info(f"Stopping service: {service.name}")
         service.stop()
     elif action == "install":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
-            logger.info(f"Installing/updating service: {service.name}")
             service.install()
     elif action == "uninstall":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
-            type_confirmation = questionary.text(f"Please type {service.id} to confirm uninstallation:")
-            if type_confirmation.ask() == service.id:
-                logger.info(f"Uninstalling service: {service.name}")
+            type_confirmation = questionary.text(f"Please type {service.id} to confirm uninstallation (or type cancel):")
+
+            value = type_confirmation.ask()
+
+            if value == "cancel":
+                questionary.print("Canceled", style="fg:ansired")
+            elif value != service.id:
+                questionary.print("Invalid input, please try again", style="fg:ansired")
+            elif value == service.id:
                 service.uninstall()
 
     choices.any_key.ask()

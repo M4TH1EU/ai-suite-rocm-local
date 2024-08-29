@@ -41,12 +41,15 @@ class Stack:
 
 
     def install(self):
-        self.check_for_broken_install()
-        self.create_venv()
-        self._install()
+        if self.is_installed():
+            self.update()
+        else:
+            self.check_for_broken_install()
+            self.create_venv()
+            self._install()
 
-        self.create_file('.installed', 'true')
-        logger.info(f"Installed {self.name}")
+            self.create_file('.installed', 'true')
+            logger.info(f"Installed {self.name}")
 
     def _install(self):
         pass
@@ -66,17 +69,33 @@ class Stack:
 
     def update(self, folder: str = 'webui'):
         if self.is_installed():
+            status = self.status()
+            if status:
+                self.stop()
+
             logger.info(f"Updating {self.name}")
             self.git_pull(folder)
+            self._update()
+
+            if status:
+                self.start()
         else:
             logger.warning(f"Could not update {self.name} as {self.name} is not installed")
             choices.any_key.ask()
 
+    def _update(self):
+        pass
+
     def uninstall(self):
         logger.info(f"Uninstalling {self.name}")
+        if self.status():
+            self.stop()
         self.bash(f"rm -rf {self.path}")
 
     def start(self):
+        if self.status():
+            logger.warning(f"{self.name} is already running")
+
         if self.is_installed():
             self._start()
         else:
@@ -90,6 +109,8 @@ class Stack:
         if self.status():
             logger.debug(f"Killing {self.name} with PID: {self.pid}")
             psutil.Process(self.pid).kill()
+        else:
+            logger.warning(f"{self.name} is not running")
 
         self.set_pid(None)
 
@@ -158,7 +179,6 @@ class Stack:
                     return
                 else:
                     # TODO: attach to subprocess / redirect logs?
-                    logger.info("Continuing without restarting...")
                     return
             else:
                 logger.debug(f"Running command as daemon: {cmd}")

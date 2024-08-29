@@ -24,7 +24,7 @@ jobs:
 
       # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
@@ -61,14 +61,14 @@ jobs:
 
       # Step 7: Upload bitsandbytes wheel artifact
       - name: Upload bitsandbytes wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bitsandbytes-wheels
           path: /tmp/bitsandbytes/dist/*.whl
 
       # Step 8: Upload llama-cpp-python wheel artifact
       - name: Upload llama-cpp-python wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: llama-cpp-python-wheels
           path: /tmp/llama-cpp-python/dist/*.whl

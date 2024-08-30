@@ -2,7 +2,7 @@ import importlib
 import json
 import os
 import subprocess
-import urllib
+from urllib import request, error
 
 from core.stack import Stack
 from core.vars import ROCM_VERSION, logger
@@ -13,7 +13,7 @@ def get_prebuilts(repo_owner: str = "M4TH1EU", repo_name: str = "ai-suite-rocm-l
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/tags/{release_tag}"
 
     try:
-        with urllib.request.urlopen(api_url) as response:
+        with request.urlopen(api_url) as response:
             if response.status != 200:
                 logger.error(f"Failed to fetch data: HTTP Status {response.status}")
                 return []
@@ -27,7 +27,7 @@ def get_prebuilts(repo_owner: str = "M4TH1EU", repo_name: str = "ai-suite-rocm-l
 
             return assets
 
-    except urllib.error.URLError as e:
+    except error.URLError as e:
         logger.error(f"Error fetching release data: {e}")
 
 

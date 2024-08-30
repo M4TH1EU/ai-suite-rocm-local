@@ -29,8 +29,8 @@ class TextGenerationWebui(Stack):
         # Install the webui
         self.git_clone(url=self.url, dest="webui")
         self.remove_line_in_file(["accelerate", "lm_eval", "optimum", "autoawq", "llama_cpp_python"],
-                                 "../text-generation-rocm/webui/requirements_amd.txt")
-        self.install_requirements("../text-generation-rocm/webui/requirements_amd.txt")
+                                 "webui/requirements_amd.txt")
+        self.install_requirements("webui/requirements_amd.txt")
         self.pip_install(["accelerate", "optimum"])
         self.pip_install(
             "https://github.com/casper-hansen/AutoAWQ_kernels/releases/download/v0.0.7/autoawq_kernels-0.0.7+rocm571-cp310-cp310-linux_x86_64.whl",
@@ -39,7 +39,7 @@ class TextGenerationWebui(Stack):
             "https://github.com/casper-hansen/AutoAWQ/releases/download/v0.2.6/autoawq-0.2.6-cp310-cp310-linux_x86_64.whl",
             no_deps=True)
         # Fix llama trying to use cuda version
-        self.remove_line_in_file("llama_cpp_cuda", "../text-generation-rocm/webui/modules/llama_cpp_python_hijack.py")
+        self.remove_line_in_file("llama_cpp_cuda", "webui/modules/llama_cpp_python_hijack.py")
 
         # Install useful packages
         self.pip_install(

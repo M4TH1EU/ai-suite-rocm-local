@@ -19,7 +19,7 @@ def handle_services(action, service):
 
     service = loaded_services[service]
     if action == "start":
-        questionary.print(f"Starting {service.name}...")
+        questionary.print(f"Starting {service.name} (127.0.0.1:{service.port})...")
         service.start()
     elif action == "stop":
         questionary.print(f"Stopping {service.name}...")

@@ -2,6 +2,7 @@ from core.stack import Stack
 
 
 class TextGenerationWebui(Stack):
+
     def __init__(self):
         super().__init__(
             'Text Generation',
@@ -9,6 +10,8 @@ class TextGenerationWebui(Stack):
             5000,
             'https://github.com/oobabooga/text-generation-webui/'
         )
+
+        self.exllama = "0.2.1"
 
     def _install(self):
         # Install LlamaCpp from prebuilt
@@ -41,10 +44,16 @@ class TextGenerationWebui(Stack):
         # Fix llama trying to use cuda version
         self.remove_line_in_file("llama_cpp_cuda", "webui/modules/llama_cpp_python_hijack.py")
 
-        # Install useful packages
+        # Install ExLlamaV2 and auto-gptq
         self.pip_install(
-            "https://github.com/turboderp/exllamav2/releases/download/v0.1.9/exllamav2-0.1.9+rocm6.1.torch2.4.0-cp310-cp310-linux_x86_64.whl")
+            f"https://github.com/turboderp/exllamav2/releases/download/v{self.exllama}/exllamav2-{self.exllama}+rocm6.1.torch2.4.0-cp310-cp310-linux_x86_64.whl")
         self.install_from_prebuilt("bitsandbytes")
+        self.pip_install("auto-gptq", args=["--no-build-isolation", "--extra-index-url",
+                                            "https://huggingface.github.io/autogptq-index/whl/rocm573/"])
+
+    def _update(self):
+        self.pip_install(
+            f"https://github.com/turboderp/exllamav2/releases/download/v{self.exllama}/exllamav2-{self.exllama}+rocm6.1.torch2.4.0-cp310-cp310-linux_x86_64.whl")
         self.pip_install("auto-gptq", args=["--no-build-isolation", "--extra-index-url",
                                             "https://huggingface.github.io/autogptq-index/whl/rocm573/"])
 

@@ -3,7 +3,7 @@ import os
 
 PYTHON_EXEC = 'python3.10'
 PATH = os.path.dirname(os.path.abspath(__file__))
-ROCM_VERSION = "6.1.2"
+ROCM_VERSION = "6.2"
 
 logger = logging.getLogger('ai-suite-rocm')
 

@@ -6,11 +6,11 @@ on:
       rocm_version:
         description: 'ROCm version'
         required: true
-        default: '6.1.2'
+        default: '6.2'
       torch_version:
-        description: 'Torch version (e.g., rocm6.1)'
+        description: 'Torch version (e.g., rocm6.2)'
         required: true
-        default: 'rocm6.1'
+        default: 'rocm6.2'
 
 jobs:
   build:

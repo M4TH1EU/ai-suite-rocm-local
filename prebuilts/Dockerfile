@@ -1,4 +1,4 @@
-ARG ROCM_VERSION=6.1.2
+ARG ROCM_VERSION=6.2
 FROM rocm/dev-ubuntu-22.04:${ROCM_VERSION}
 # also works without -complete for specific arch (tested on gfx1030)
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set variables
-IMAGE_NAME="prebuilts-rocm:6.1.2"
+IMAGE_NAME="prebuilts-rocm:6.2"
 CONTAINER_NAME="prebuilts-rocm"
 FILES_TO_COPY=["/tmp/bitsandbytes/dist/", "/tmp/llama-cpp-python/dist/"]
 WHERE_TO_PASTE="./build_output/"

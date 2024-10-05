@@ -39,7 +39,6 @@ class Stack:
 
         self.pid = config.get(f"{self.name}-pid")
 
-
     def install(self):
         if self.is_installed():
             self.update()
@@ -74,8 +73,10 @@ class Stack:
                 self.stop()
 
             logger.info(f"Updating {self.name}")
+            symlinks = utils.find_symlink_in_folder(self.path)
             self.git_pull(folder)
             self._update()
+            utils.create_symlinks(symlinks)
 
             if status:
                 self.start()

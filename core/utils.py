@@ -1,7 +1,9 @@
 import importlib
 import json
 import os
+import shutil
 import subprocess
+from pathlib import Path
 from urllib import request, error
 
 from core.stack import Stack
@@ -79,3 +81,24 @@ def load_service_from_string(service: str) -> Stack:
     met = getattr(module, service_name)
     return met()
 
+
+def find_symlink_in_folder(folder: str):
+    symlinks = {}
+    for file in Path(folder).rglob("webui/**"):
+        if file.is_symlink():
+            symlinks[file] = file.resolve()
+
+    return symlinks
+
+
+def create_symlinks(symlinks: dict[Path, Path]):
+    for target, link in symlinks.items():
+        logger.debug(f"(re)Creating symlink: {link} -> {target}")
+
+        if target.is_symlink():
+            target.unlink()
+
+        if target.exists() and target.is_dir():
+            shutil.rmtree(target)
+
+        os.symlink(link, target)

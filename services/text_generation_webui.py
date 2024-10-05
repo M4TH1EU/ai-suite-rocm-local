@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from core.stack import Stack
 
 
@@ -30,7 +32,7 @@ class TextGenerationWebui(Stack):
         # self.pip("install -e .", path="triton")
 
         # Install the webui
-        self.git_clone(url=self.url, dest="webui")
+        self.git_clone(url=self.url, dest=Path(self.path / "webui"))
         self.remove_line_in_file(["accelerate", "lm_eval", "optimum", "autoawq", "llama_cpp_python"],
                                  "webui/requirements_amd.txt")
         self.install_requirements("webui/requirements_amd.txt")
@@ -59,5 +61,5 @@ class TextGenerationWebui(Stack):
 
     def _start(self):
         args = ["--listen", "--listen-port", str(self.port)]
-        self.python(f"server.py", args=args, current_dir="webui",
+        self.python(f"server.py", args=args, current_dir=Path(self.path / "webui"),
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], daemon=True)

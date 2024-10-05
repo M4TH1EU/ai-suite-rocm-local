@@ -27,7 +27,7 @@ def load_services():
 
 
 if __name__ == '__main__':
-    setup_logger(logging.INFO)
+    setup_logger(logging.DEBUG)
     logger.info("Starting AI Suite for ROCM")
 
     setup_config()

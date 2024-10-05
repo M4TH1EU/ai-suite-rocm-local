@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from core.stack import Stack
 
 
@@ -12,7 +14,7 @@ class XttsWebui(Stack):
 
     def _install(self):
         # Install the webui
-        self.git_clone(url=self.url, dest="webui")
+        self.git_clone(url=self.url, dest=Path(self.path / "webui"))
 
         self.remove_line_in_file("torch", "webui/requirements.txt")
         self.install_requirements("webui/requirements.txt")
@@ -32,5 +34,5 @@ class XttsWebui(Stack):
 
     def _start(self):
         args = ["--host", "0.0.0.0", "--port", str(self.port)]
-        self.python(f"server.py", current_dir="webui",
+        self.python(f"server.py", current_dir=Path(self.path / "webui"),
                     env=["TORCH_BLAS_PREFER_HIPBLASLT=0"], args=args, daemon=True)

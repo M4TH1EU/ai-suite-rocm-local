@@ -15,6 +15,7 @@ def handle_services(action, service):
     clear_terminal()
 
     if service == "back":
+        update_choices()
         return
 
     service = loaded_services[service]
@@ -32,7 +33,8 @@ def handle_services(action, service):
     elif action == "uninstall":
         confirmation = choices.are_you_sure.ask()
         if confirmation:
-            type_confirmation = questionary.text(f"Please type {service.id} to confirm uninstallation (or type cancel):")
+            type_confirmation = questionary.text(
+                f"Please type {service.id} to confirm uninstallation (or type cancel):")
 
             value = type_confirmation.ask()
 

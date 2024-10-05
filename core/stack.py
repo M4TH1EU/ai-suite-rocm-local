@@ -7,6 +7,7 @@ from typing import Union, List, Optional
 import psutil
 
 from core import utils, screen
+from core.screen import Screen
 from core.vars import logger, PYTHON_EXEC
 from ui import choices
 
@@ -28,6 +29,7 @@ class Stack:
         self.port = port
         self.pid_file = self.path / f".pid"
         self.pid = self.read_pid()
+        self.screen_session: Screen = None
 
     def read_pid(self) -> Optional[int]:
         """
@@ -156,7 +158,10 @@ class Stack:
 
         :return: True if the service is running, False otherwise.
         """
-        return self.pid is not None and psutil.pid_exists(self.pid)
+        if self.screen_session and self.pid:
+            return screen.exists(self.screen_session.pid)
+        else:
+            return self.pid is not None and psutil.pid_exists(self.pid)
 
     def create_venv(self) -> None:
         """Create a Python virtual environment for the stack."""
@@ -224,9 +229,9 @@ class Stack:
                 # process = subprocess.Popen(full_cmd, shell=True, preexec_fn=os.setpgrp,
                 #                            stdout=config.open_file(f"{self.id}-stdout"),
                 #                            stderr=config.open_file(f"{self.id}-stderr"))
-                screen_session = screen.create(name=self.id)
-                screen_session.send(f"'{full_cmd}'")
-                self.write_pid(screen_session.pid)
+                self.screen_session = screen.create(name=self.id)
+                self.screen_session.send(f"'{full_cmd} && screen -wipe'")
+                self.write_pid(self.screen_session.pid)
                 return
         else:
             logger.debug(f"Running command: {full_cmd}")

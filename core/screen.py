@@ -53,7 +53,7 @@ def kill(pid):
     os.kill(pid, signal.SIGTERM)
 
 
-def exists(pid: int) -> int:
+def exists(pid: int) -> bool:
     command = f"screen -S {str(pid)} -Q select .".split()
     pop = subprocess.Popen(command, stdout=subprocess.DEVNULL)
     pop.wait()

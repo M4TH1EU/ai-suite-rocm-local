@@ -59,6 +59,12 @@ jobs:
           mkdir -p /tmp/llama-cpp-python/
           docker cp prebuilt-container:/tmp/llama-cpp-python/dist/ /tmp/llama-cpp-python/
 
+      # Step 6: Copy xformers wheel artifact to host
+      - name: Copy xformers wheel to host
+        run: |
+          mkdir -p /tmp/xformers/
+          docker cp prebuilt-container:/tmp/xformers/dist/ /tmp/xformers/
+
       # Step 7: Upload bitsandbytes wheel artifact
       - name: Upload bitsandbytes wheel
         uses: actions/upload-artifact@v4
@@ -73,7 +79,14 @@ jobs:
           name: llama-cpp-python-wheels
           path: /tmp/llama-cpp-python/dist/*.whl
 
-      # Step 9: Cleanup Docker container
+      # Step 9: Upload xformers wheel artifact
+      - name: Upload xformers wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: xformers-wheels
+          path: /tmp/xformers/dist/*.whl
+
+      # Step 10: Cleanup Docker container
       - name: Cleanup
         run: |
           docker rm prebuilt-container

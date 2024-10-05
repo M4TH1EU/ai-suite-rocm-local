@@ -16,11 +16,3 @@ python3.10 setup.py bdist_wheel --universal
 git clone --recurse-submodules https://github.com/abetlen/llama-cpp-python.git /tmp/llama-cpp-python
 cd /tmp/llama-cpp-python
 CMAKE_ARGS="-D GGML_HIPBLAS=on -D AMDGPU_TARGETS=${GPU_TARGETS}" FORCE_CMAKE=1 python3.10 -m build --wheel
-
-
-# ROCM xformers
-## Clone repo and install python requirements
-pip3 install ninja
-git clone --depth 1 https://github.com/facebookresearch/xformers.git /tmp/xformers
-cd /tmp/xformers
-python3.10 setup.py bdist_wheel --universal

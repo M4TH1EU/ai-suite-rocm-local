@@ -36,7 +36,7 @@ class Screen:
         os.system(f'screen -S {self.pid} -X stuff {command}{end}')
 
 
-def create(name, shell=os.environ['SHELL'], logfile=None, title=None) -> Screen:
+def create(name, shell=os.environ['SHELL'], logfile=None, title=None, kill_on_exit=False) -> Screen:
     command = ["screen", "-DmS", name, '-s', shell]
     if logfile:
         command.append('-Logfile')
@@ -46,7 +46,7 @@ def create(name, shell=os.environ['SHELL'], logfile=None, title=None) -> Screen:
         command.append(title)
     process = subprocess.Popen(command)
     while not process.pid: pass
-    return Screen(process.pid)
+    return Screen(process.pid, kill_on_exit)
 
 
 def kill(pid):

@@ -96,7 +96,7 @@ class Stack:
 
             logger.info(f"Updating {self.name}")
             symlinks = utils.find_symlink_in_folder(self.path)
-            self.git_pull(folder)
+            self.git_pull(self.path / folder)
             self._update()
             utils.create_symlinks(symlinks)
 
@@ -142,7 +142,10 @@ class Stack:
                 proc.wait(timeout=5)
             except (psutil.NoSuchProcess, psutil.TimeoutExpired):
                 logger.warning(f"{self.name} did not terminate gracefully, forcing kill")
-                psutil.Process(self.pid).kill()
+                try:
+                    psutil.Process(self.pid).kill()
+                except psutil.NoSuchProcess:
+                    pass
             self.remove_pid_file()
         else:
             logger.warning(f"{self.name} is not running")
@@ -229,7 +232,7 @@ class Stack:
                 # process = subprocess.Popen(full_cmd, shell=True, preexec_fn=os.setpgrp,
                 #                            stdout=config.open_file(f"{self.id}-stdout"),
                 #                            stderr=config.open_file(f"{self.id}-stderr"))
-                self.screen_session = screen.create(name=self.id)
+                self.screen_session = screen.create(name=self.id, kill_on_exit=True)
                 self.screen_session.send(f"'{full_cmd} && screen -wipe'")
                 self.write_pid(self.screen_session.pid)
                 return
@@ -250,9 +253,9 @@ class Stack:
         logger.info(f"Cloning {url}")
         self.bash(f"git clone {f'-b {branch}' if branch else ''} {url} {dest or ''}")
 
-    def git_pull(self, repo_folder: str, force: bool = False) -> None:
+    def git_pull(self, repo_folder: Path, force: bool = False) -> None:
         """Pull changes from a git repository."""
-        self.bash(f"git reset --hard HEAD {'&& git clean -f -d' if force else ''} && git pull", Path(repo_folder))
+        self.bash(f"git reset --hard HEAD {'&& git clean -f -d' if force else ''} && git pull", repo_folder)
 
     def install_from_prebuilt(self, name):
         for prebuilt in utils.get_prebuilts():
